@@ -1,0 +1,366 @@
+[
+    {
+        "id": "c9962a6f346ff0d8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "cfaae26a5b701cef",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 140,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "107c0afcaad482da",
+        "type": "http response",
+        "z": "c9962a6f346ff0d8",
+        "name": "result",
+        "statusCode": "",
+        "headers": {},
+        "x": 830,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "30e5d1fcd68f080e",
+        "type": "http in",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "url": "/css",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "726cb4f6ad6ac6fd"
+            ]
+        ]
+    },
+    {
+        "id": "726cb4f6ad6ac6fd",
+        "type": "template",
+        "z": "c9962a6f346ff0d8",
+        "name": "css",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "css",
+        "syntax": "mustache",
+        "template": "\n::-webkit-scrollbar {\n  width: 0.1px;\n  scrollbar-color: #9bc7f38b;\n}\n.containerBody {\n  top:0 !important;\n  left: 0 !important; \n  height: 100vh !important;\n  width: 100% !important;\n  padding: 0 !important;\n  background-image: linear-gradient(200deg, #9bffe667 25%, #ffffff 100%) !important;\n\n}\n\n.containerApp {\n    max-height: 98vh !important;\n    padding: 0 !important;\n    top: 50vh !important;\n    left: 50vw !important;\n    transform: translate(-50%, -50%);\n}\n\n.logoText span {\n    font-size: 26px !important;\n    text-align: center !important;\n}\n\n.buttonLaunch span {\n    color: white !important;\n}\n\n.carousel img {\n    border-radius: 10px !important;\n    margin: auto 4px !important;\n}\n\n.carousel>div div {\n    border: solid transparent 2px !important;\n}\n\n.modalErrInfo {\n    border-radius: 10px !important;\n    background-color: rgba(237, 178, 158, 0.9) !important;\n}\n\n.modalErrInfo span {\n    color: #fff !important;\n}\n",
+        "output": "str",
+        "x": 270,
+        "y": 80,
+        "wires": [
+            [
+                "77fce1906ee6548b"
+            ]
+        ]
+    },
+    {
+        "id": "77fce1906ee6548b",
+        "type": "http response",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "content-type": "text/css"
+        },
+        "x": 410,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c3e0216c25769b40",
+        "type": "function",
+        "z": "c9962a6f346ff0d8",
+        "name": "to Stable Diffusion",
+        "func": "const data = msg.payload;\n\nmsg.url = 'https://stablediffusionapi.com/api/v3/text2img';\n\nmsg.payload = {\n    \"key\": data.SD_API_Key,\n    \"prompt\": data.prompt,\n    \"negative_prompt\": null,\n    \"width\": \"512\",\n    \"height\": \"512\",\n    \"samples\": data.countOfImages,\n    \"num_inference_steps\": \"20\",\n    \"safety_checker\": \"no\",\n    \"enhance_prompt\": \"yes\",\n    \"seed\": null,\n    \"guidance_scale\": 7.5,\n    \"multi_lingual\": \"no\",\n    \"panorama\": \"no\",\n    \"self_attention\": \"no\",\n    \"upscale\": \"no\",\n    \"embeddings_model\": null,\n    \"webhook\": null,\n    \"track_id\": null\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 200,
+        "wires": [
+            [
+                "32d801beda96497c",
+                "63f353abce8b044d"
+            ]
+        ]
+    },
+    {
+        "id": "547ed6f5ae253d68",
+        "type": "function",
+        "z": "c9962a6f346ff0d8",
+        "name": "result",
+        "func": "if (msg.payload.status == \"error\") {\n    node.warn(\"my warning\");\n    msg.payload = {\n        isError: true,\n        errMessage: `Oooops 😔\n        \n${msg.payload.message}`\n    };\n} else {\n    msg.payload = msg.payload.output.map(link => ({ \"img\": link }))\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 200,
+        "wires": [
+            [
+                "107c0afcaad482da",
+                "8da4df316685c916"
+            ]
+        ]
+    },
+    {
+        "id": "8da4df316685c916",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 4",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "32d801beda96497c",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 5",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "63f353abce8b044d",
+        "type": "http request",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [
+                "8da4df316685c916",
+                "547ed6f5ae253d68"
+            ]
+        ]
+    },
+    {
+        "id": "023db0dd23de8868",
+        "type": "http in",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "url": "/launch",
+        "method": "post",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 200,
+        "wires": [
+            [
+                "c3e0216c25769b40",
+                "cfaae26a5b701cef"
+            ]
+        ]
+    },
+    {
+        "id": "c4fb00965cc02703",
+        "type": "http in",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "url": "/download",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 380,
+        "wires": [
+            [
+                "7a40195f3eab5349",
+                "b86062ce186e0e31"
+            ]
+        ]
+    },
+    {
+        "id": "7a40195f3eab5349",
+        "type": "function",
+        "z": "c9962a6f346ff0d8",
+        "name": "download img from server",
+        "func": "msg.url = msg.payload.url;\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 380,
+        "wires": [
+            [
+                "9a4e91052d8ad0fe",
+                "d29319c6cd4c5e71"
+            ]
+        ]
+    },
+    {
+        "id": "9a4e91052d8ad0fe",
+        "type": "http request",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "body",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 590,
+        "y": 380,
+        "wires": [
+            [
+                "bc2b13e47e8986bb",
+                "591ba8033a63b728"
+            ]
+        ]
+    },
+    {
+        "id": "9e81929266e7566d",
+        "type": "http response",
+        "z": "c9962a6f346ff0d8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 950,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "bc2b13e47e8986bb",
+        "type": "function",
+        "z": "c9962a6f346ff0d8",
+        "name": "convert to PNG",
+        "func": "msg.headers = {\n    \"Content-Disposition\": \"attachment;filename=filename.png\",\n    'Content-Type': 'image/png'\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 380,
+        "wires": [
+            [
+                "9e81929266e7566d",
+                "c3fc76214cee2a61"
+            ]
+        ]
+    },
+    {
+        "id": "b86062ce186e0e31",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 160,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "d29319c6cd4c5e71",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 7",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 420,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "591ba8033a63b728",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 8",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "c3fc76214cee2a61",
+        "type": "debug",
+        "z": "c9962a6f346ff0d8",
+        "name": "debug 9",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 440,
+        "wires": []
+    }
+]
